@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07121c">
+  <title>DH116 · Dexterous Manipulation Demo</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">D<span>H</span></div><div>
+        <div class="eyebrow">ROBOTICS RESEARCH / GROUP MEETING</div>
+        <h1>DH116 <span>DEXTEROUS MANIPULATION</span></h1>
+      </div></div>
+      <div class="top-status">
+        <span id="modeBadge" class="badge mint">● SIMULATION</span>
+        <span class="badge locked">⌁ HARDWARE LOCKED</span>
+        <span class="date">6 ACTIVE AXES · 11 MOVABLE JOINTS</span>
+      </div>
+    </header>
+    <div class="toolbar">
+      <button id="startPresentation" class="primary">▶ START PRESENTATION</button>
+      <button id="pauseResume" title="空格：暂停 / 继续">Ⅱ 暂停</button>
+      <button id="step" title="右方向键：单步">↦ 单步</button>
+      <select id="stepSize" aria-label="单步间隔"><option value=".2">0.2 s</option><option value=".05">0.05 s</option></select>
+      <button id="stop" title="Escape：停止">■ 停止</button>
+      <button id="reset" title="R：复位">↺ 复位</button>
+      <div class="toolbar-sep"></div>
+      <label class="speed-label">速度 <input id="speed" type="range" min=".25" max="2.5" step=".25" value="1"><strong id="speedValue">1.00×</strong></label>
+      <button id="autoOrbit" title="相机自动环绕">◌ 自动视角</button>
+      <button id="resetView">◎ 视角复位</button>
+      <button id="fullscreen">⛶ FULLSCREEN</button>
+    </div>
+    <div class="grasp-controls">
+      <label><input id="showFrames" type="checkbox"> SHOW COORDINATE FRAMES</label>
+      <label><input id="showContacts" type="checkbox" checked> 重力 / 接触</label>
+      <label><input id="transparentHand" type="checkbox"> 透明手部</label>
+      <button id="viewFront">正面</button><button id="viewSide">侧面</button><button id="viewOblique">斜上方</button>
+      <span>VIRTUAL WRIST / END-EFFECTOR · 合成末端轨迹，独立于六电机</span>
+    </div>
+    <main class="main-grid">
+      <section class="panel stage-panel">
+        <div class="panel-title"><span>01 / REAL URDF VISUALIZATION</span><span id="modelStatus">加载厂家 DH116-R000-A1 模型…</span></div>
+        <div id="model" class="model"></div>
+        <div id="graspTelemetry" class="grasp-telemetry" hidden></div>
+        <div class="model-overlay top-left"><span class="model-tag">OFFICIAL DH116-R000-A1 URDF / STL</span><span class="model-tag warn">ANIMATION MAPPING ≠ HARDWARE CALIBRATION</span></div>
+        <div class="model-overlay bottom-left"><div class="axis-legend"><b class="x">X</b> / <b class="y">Y</b> / <b class="z">Z</b> · 鼠标拖动旋转 · 滚轮缩放</div><div id="objectBadge" class="object-badge">OBJECT / NONE</div></div>
+        <div class="model-overlay bottom-right"><span>MODEL JOINTS</span><strong id="modelJointCount">6 ACTIVE + 5 COUPLED</strong><span id="contactMode">MODEL MOTION / NO CONTACT TASK</span></div>
+      </section>
+      <aside class="right-column">
+        <section class="panel scenario-panel">
+          <div class="panel-title"><span>02 / SCENE ORCHESTRATION</span><span id="sceneCounter">00 / 13</span></div>
+          <div class="scene-main"><div class="eyebrow">CURRENT SCENE</div><h2 id="sceneTitle">待命 / 请选择演示</h2><p id="sceneGoal">点击 START PRESENTATION 播放完整组会演示，或选择下方场景。</p>
+            <div class="scene-meta"><span id="sceneStage">STAGE / STANDBY</span><span id="sceneTime">00:00 / 01:44</span></div></div>
+          <div id="sceneButtons" class="scene-buttons"></div>
+          <div class="explain"><div class="eyebrow">讲解提示 / TECHNICAL NARRATIVE</div><p id="explanation">真实模型文件已经找到。动画目标为 0–1 归一化模拟值，不能直接用于真机。</p></div>
+        </section>
+        <section class="panel axis-panel">
+          <div class="panel-title"><span>03 / SIX-AXIS CONTROL & FEEDBACK</span><span id="feedbackSource">SYNTHETIC FEEDBACK</span></div>
+          <div class="axis-head"><span>电机 / 运动</span><span>目标 · 模拟反馈</span><span>状态</span></div>
+          <div id="axisRows"></div>
+          <div class="axis-foot">滑块：仅改变归一化模拟目标。SDK raw 与机械角度的六轴标定仍未完成。</div>
+        </section>
+      </aside>
+    </main>
+    <section class="lower-grid">
+      <div class="panel chart-panel"><div class="panel-title"><span>04 / TRAJECTORY MONITOR</span><span>实线 TARGET · 虚线 SYNTHETIC FEEDBACK</span></div><canvas id="chart"></canvas><div id="chartLegend" class="chart-legend"></div></div>
+      <div class="panel telemetry-panel"><div class="panel-title"><span>05 / TELEOP CONCEPT PIPELINE</span><span>SYNTHETIC INPUT — NO LIVE CAMERA</span></div>
+        <div class="teleop-flow"><div><span>01</span>合成手部输入<strong id="teleopInput">OPEN</strong></div><em>→</em><div><span>02</span>关键点 / 特征<strong id="teleopFeature">6 FEATURES</strong></div><em>→</em><div><span>03</span>动作映射<strong id="teleopMapping">NORMALIZED</strong></div><em>→</em><div><span>04</span>虚拟 DH116<strong id="teleopOutput">6 TARGETS</strong></div></div>
+        <div class="replay"><div class="eyebrow">SYNTHETIC TRAJECTORY REPLAY / READ ONLY</div><select id="replaySelect"><option value="">选择模拟轨迹回放…</option></select><button id="loadReplay">加载回放</button><button id="backSimulation">返回模拟</button><p id="replayInfo">本网页不包含历史实验日志；回放轨迹为浏览器生成的模拟数据。</p></div>
+      </div>
+      <div class="panel log-panel"><div class="panel-title"><span>06 / EVENT LOG</span><span id="eventCount">0 EVENTS</span></div><div id="events" class="events"></div></div>
+    </section>
+    <footer><div class="progress"><div id="progressFill"></div></div><span id="progressLabel">演示待启动 · 约 135 秒</span><span>DH116 RESEARCH DEMO // BROWSER SIMULATION · NO LIVE HARDWARE</span></footer>
+  </div>
+  <div id="fatal" hidden></div>
+  <script type="module" src="./app.bundle.js"></script>
+</body>
+</html>
