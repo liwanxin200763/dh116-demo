@@ -1,0 +1,36 @@
+{
+  "active_motors": 6,
+  "total_movable_joints": 11,
+  "motor_labels": {
+    "1": [
+      "拇指",
+      "侧摆 / 外展"
+    ],
+    "2": [
+      "拇指",
+      "弯曲"
+    ],
+    "3": [
+      "食指",
+      "弯曲"
+    ],
+    "4": [
+      "中指",
+      "弯曲"
+    ],
+    "5": [
+      "无名指",
+      "弯曲"
+    ],
+    "6": [
+      "小拇指",
+      "弯曲"
+    ]
+  },
+  "hardware": "EXP05_MULTI_HOME_UNRESOLVED_20261009",
+  "model_kind": "OFFICIAL_URDF_ANIMATION_MAPPING_UNCALIBRATED",
+  "model_path": "./assets/DH116-R000-A1/urdf/DH116-R000-A1.urdf",
+  "simulation_limits_are_not_hardware_limits": true,
+  "site_mode": true,
+  "historical_logs_included": false
+}

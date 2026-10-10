@@ -1,0 +1,10 @@
+{
+  "runs": [
+    {
+      "kind": "SYNTHETIC_SCENE",
+      "scene": "FOUR_FINGER_FLEXION",
+      "run_id": "synthetic-four-finger",
+      "title": "四指协同轨迹 · 模拟回放"
+    }
+  ]
+}

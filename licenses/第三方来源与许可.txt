@@ -1,0 +1,2 @@
+模型来自厂家 ROS2 hand_control_description 包，标注 Apache-2.0；独立 DH116-R000-A1 包另标 BSD，具体再分发范围仍需厂家确认。
+Three.js: MIT；urdf-loader 与 Rapier: Apache-2.0。Rapier WASM 已内嵌于 app.bundle.js。
